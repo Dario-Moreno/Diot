@@ -1,0 +1,55 @@
+{
+  "name": "netdoc",
+  "version": "1.0.0",
+  "description": "Constructor de documentación SPA desde archivos Markdown",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run compile && node dist/scripts/build.js",
+    "compile": "tsc",
+    "dev": "npm run compile && npm run build && npm run watch",
+    "serve": "npx http-server dist -p 3000 -o",
+    "clean": "rimraf dist",
+    "watch": "nodemon --watch src --ext ts,md --exec \"npm run build\"",
+    "prebuild": "npm run clean",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
+    "prepare": "husky",
+    "check-types": "tsc --noEmit --pretty",
+    "docs:init": "npx ts-node src/scripts/cli.ts init",
+    "docs:build": "npx ts-node src/scripts/cli.ts build",
+    "docs:dev": "npx ts-node src/scripts/cli.ts dev"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,yml,yaml}": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "keywords": [
+    "documentation",
+    "spa",
+    "markdown",
+    "typescript",
+    "static-site-generator"
+  ],
+  "author": "Iyari Maldonado",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.15.30",
+    "chokidar": "^4.0.3",
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0",
+    "nodemon": "^3.1.10",
+    "prettier": "3.5.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.1"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^15.0.12"
+  }
+}

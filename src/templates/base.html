@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="es" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{TITLE}}</title>
+    <link rel="icon" href="{{FAVICON}}" />
+    <!-- Estilos principales -->
+    {{INLINE_STYLES}}
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
+    ></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.umd.min.js
+"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
+"></script>
+  </head>
+  <body>
+    <div class="app-container" x-data="docsApp()" :class="{ 'sidebar-collapsed': !sidebarOpen }">
+      <!-- Header -->
+      <header class="header">
+        <div style="display: flex; align-items: center; gap: 1rem">
+          <div class="logo">
+            <template x-if="logoUrl">
+              <img
+                :src="logoUrl"
+                alt="Efficintix"
+                style="
+                  height: 2rem;
+                  vertical-align: middle;
+                  margin-right: 0.5rem;
+                "
+              />
+            </template>
+            <span x-text="logo"></span> <span x-text="title"></span>
+          </div>
+        </div>
+
+        <div class="header-controls" style="position: relative; display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+          <!-- Eliminados los controles de ancho del sidebar aquí -->
+          <input
+            type="text"
+            placeholder="Buscar..."
+            class="search-box"
+            x-model="searchQuery"
+            @focus="searchModalOpen = true; $nextTick(() => { $refs.searchInput.select(); })"
+            x-ref="searchInput"
+            readonly
+            style="cursor: pointer; background: var(--bg-primary);"
+          />
+          <div style="display: flex; flex-direction: column; gap: 0.18rem; align-items: flex-end;">
+            <!-- Botón para colapsar/mostrar ambos paneles -->
+            <button class="sidebar-toggle" @click="toggleAllPanels()" aria-label="Colapsar/Expandir menús" style="font-size: 0.6rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
+              ⮜⮞
+            </button>
+            <button class="theme-toggle" @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode);" :aria-label="darkMode ? 'Modo claro' : 'Modo oscuro'" style="font-size: 0.65rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
+              <span x-show="!darkMode" style="font-size: 0.8em;">🌙</span>
+              <span x-show="darkMode" style="font-size: 0.8em;">☀️</span>
+            </button>
+          </div>
+        </div>
+        <!-- Modal de búsqueda -->
+        <div
+          x-show="searchModalOpen"
+          x-transition.opacity
+          style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+          "
+          @click.self="closeSearchModal()"
+        >
+          <div
+            style="
+              background: #fff;
+              color: #222;
+              border-radius: 12px;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+              width: 100%;
+              max-width: 600px;
+              max-height: 80vh;
+              display: flex;
+              flex-direction: column;
+              margin: auto;
+              transform: translateY(0);
+            "
+            @click.stop
+          >
+            <!-- Header del modal -->
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                padding: 20px;
+                border-bottom: 1px solid #eee;
+              "
+            >
+              <input
+                type="text"
+                class="search-box"
+                x-model="searchQuery"
+                @input="searchAllPages()"
+                @keydown.escape="closeSearchModal()"
+                placeholder="Buscar en la documentación..."
+                style="
+                  flex: 1;
+                  font-size: 16px;
+                  border: none;
+                  outline: none;
+                  background: transparent;
+                  padding: 8px 0;
+                "
+                x-ref="modalSearchInput"
+                autofocus
+              />
+              <button
+                @click="closeSearchModal()"
+                style="
+                  background: var(--bg-secondary);
+                  border: none;
+                  font-size: 24px;
+                  margin-left: 15px;
+                  cursor: pointer;
+                  color: #888;
+                  padding: 5px;
+                  border-radius: 4px;
+                  transition: background-color 0.2s;
+                "
+                onmouseover="this.style.backgroundColor='#f0f0f0';"
+                onmouseout="this.style.backgroundColor='transparent';"
+              >
+                ×
+              </button>
+            </div>
+            <!-- Contenido del modal -->
+            <div
+              style="
+                overflow-y: auto;
+                padding: 0 20px 20px 20px;
+                flex: 1;
+                min-height: 200px;
+              "
+            >
+              <!-- Resultados de búsqueda -->
+              <template x-if="searchQuery && searchResults.length > 0">
+                <template x-for="result in searchResults" :key="result.pageId">
+                  <div
+                    class="search-result-item"
+                    style="
+                      padding: 15px 0;
+                      cursor: pointer;
+                      border-bottom: 1px solid #f0f0f0;
+                      transition: background-color 0.2s;
+                    "
+                    @click="goToSearchResult(result); closeSearchModal();"
+                    onmouseover="this.style.backgroundColor='#f8f9fa';"
+                    onmouseout="this.style.backgroundColor='transparent';"
+                  >
+                    <strong
+                      x-text="result.title"
+                      style="display: block; margin-bottom: 5px"
+                    ></strong>
+                    <div
+                      x-html="result.snippet"
+                      style="font-size: 14px; color: #666; line-height: 1.4"
+                    ></div>
+                  </div>
+                </template>
+              </template>
+              <!-- Sin resultados -->
+              <div
+                x-show="searchQuery && searchResults.length === 0"
+                style="
+                  padding: 40px 20px;
+                  color: #888;
+                  text-align: center;
+                  font-size: 16px;
+                "
+              >
+                Sin resultados para "<span x-text="searchQuery"></span>"
+              </div>
+              <!-- Estado inicial -->
+              <div
+                x-show="!searchQuery"
+                style="
+                  padding: 40px 20px;
+                  color: #aaa;
+                  text-align: center;
+                  font-size: 16px;
+                "
+              >
+                Escribe para buscar en toda la documentación
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Sidebar -->
+      <nav class="sidebar" x-show="sidebarOpen" x-transition>
+        <!-- Controles de ancho y colapso dentro del sidebar -->
+        <div class="sidebar-width-controls" style="margin-bottom: 0.5rem; margin-top: 0; padding-top: 0; display: flex; gap: 0.25rem; align-items: center;">
+          <button
+            x-show="sidebarOpen"
+            @click="toggleSidebar()"
+            :aria-label="'Colapsar menú'"
+            class="sidebar-toggle"
+            style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
+          >
+            <span x-text="'⮜'"></span>
+          </button>
+          <button @click="setSidebarWidth('200px')" class="sidebar-btn sidebar-icon-btn" title="Angosto" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <!-- Angosto: Arrow bar left -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H7"/><path d="M11 16l-4-4 4-4"/><path d="M3 19V5"/></svg>
+          </button>
+          <button @click="setSidebarWidth('260px')" class="sidebar-btn sidebar-icon-btn" title="Normal" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <!-- Normal: Arrows maximize -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V4h4"/><path d="M8 16v4H4"/><path d="M16 4h4v4"/><path d="M20 16v4h-4"/></svg>
+          </button>
+          <button @click="setSidebarWidth('320px')" class="sidebar-btn sidebar-icon-btn" title="Ancho" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <!-- Ancho: Arrow bar to right -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h14"/><path d="M13 16l4-4-4-4"/><path d="M21 19V5"/></svg>
+          </button>
+        </div>
+        <template
+          x-for="(section, idx) in sidebarSections"
+          :key="section.title"
+        >
+          <div class="nav-section">
+            <button
+              class="nav-title"
+              @click="toggleSection(idx)"
+              style="
+                width: 100%;
+                text-align: left;
+                background: none;
+                border: none;
+                padding: 0;
+                margin-bottom: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+              "
+            >
+              <span x-text="section.title"></span>
+              <span
+                x-text="collapsedSections[idx] ? '▶' : '▼'"
+                style="float: right"
+              ></span>
+            </button>
+            <ul class="nav-list" x-show="!collapsedSections[idx]" x-transition>
+              <template x-for="item in section.items" :key="item.link">
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    :class="{ 'active': currentPage === item.link }"
+                    @click="loadPage(item.link)"
+                  >
+                    <span x-text="item.label"></span>
+                  </a>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+      </nav>
+
+      <!-- Botón flotante para expandir sidebar SOLO visible cuando está cerrado, fuera del sidebar -->
+      <button
+        x-show="!sidebarOpen"
+        @click="toggleSidebar()"
+        aria-label="Mostrar menú"
+        class="sidebar-toggle"
+        style="position: fixed; top: 80px; left: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
+      >
+        <span x-text="'⮞'"></span>
+      </button>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="content-wrapper">
+          <div class="markdown-content" x-html="renderedContent"></div>
+          <!-- Navegación prev/next -->
+          <div
+            class="nav-cards"
+            style="
+              display: flex;
+              justify-content: space-between;
+              margin-top: 2rem;
+              gap: 1rem;
+            "
+          >
+            <template x-if="navigation[currentPage]?.prev">
+              <button
+                class="nav-card prev"
+                @click="loadPage(navigation[currentPage].prev)"
+                style="
+                  flex: 1;
+                  padding: 1rem;
+                  background: var(--bg-secondary);
+                  border: 1px solid var(--border-color);
+                  border-radius: 0.75rem;
+                  cursor: pointer;
+                  text-align: left;
+                "
+              >
+                ← Anterior
+              </button>
+            </template>
+            <template x-if="navigation[currentPage]?.next">
+              <button
+                class="nav-card next"
+                @click="loadPage(navigation[currentPage].next)"
+                style="
+                  flex: 1;
+                  padding: 1rem;
+                  background: var(--bg-secondary);
+                  border: 1px solid var(--border-color);
+                  border-radius: 0.75rem;
+                  cursor: pointer;
+                  text-align: right;
+                "
+              >
+                Siguiente →
+              </button>
+            </template>
+          </div>
+        </div>
+      </main>
+
+      <!-- TOC con secciones anidadas colapsables usando Alpine.js puro -->
+      <aside class="toc" x-data="{
+  open: true,
+  tocWidth: '240px',
+  lastWidth: '240px',
+  setTocWidth(width) {
+    this.tocWidth = width;
+    this.lastWidth = width;
+    document.documentElement.style.setProperty('--toc-width', width);
+  },
+  collapseToc() {
+    this.open = false;
+    document.documentElement.style.setProperty('--toc-width', '0px');
+  },
+  expandToc() {
+    this.open = true;
+    document.documentElement.style.setProperty('--toc-width', this.lastWidth);
+  },
+  init() {
+    window.addEventListener('toggle-toc-panel', () => {
+      if (this.open) {
+        this.collapseToc();
+      } else {
+        this.expandToc();
+      }
+    });
+  },
+  toggle(node) {
+    node.collapsed = !node.collapsed;
+  },
+  scrollToHeading(id) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}"
+:style="'width: ' + (open ? tocWidth : '0px') + '; min-width: 0px; max-width: 400px;'" style="position: relative;">
+        <div class="toc-width-controls" style="margin-bottom: 0.5rem; margin-top: 0; padding-top: 0; display: flex; gap: 0.25rem; align-items: center; justify-content: flex-end;">
+          <button @click="setTocWidth('180px')" class="sidebar-btn sidebar-icon-btn" title="Angosto" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H7"/><path d="M11 16l-4-4 4-4"/><path d="M3 19V5"/></svg>
+          </button>
+          <button @click="setTocWidth('240px')" class="sidebar-btn sidebar-icon-btn" title="Normal" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V4h4"/><path d="M8 16v4H4"/><path d="M16 4h4v4"/><path d="M20 16v4h-4"/></svg>
+          </button>
+          <button @click="setTocWidth('300px')" class="sidebar-btn sidebar-icon-btn" title="Ancho" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h14"/><path d="M13 16l4-4-4-4"/><path d="M21 19V5"/></svg>
+          </button>
+          <button
+            x-show="open"
+            @click="collapseToc()"
+            aria-label="Colapsar TOC"
+            class="sidebar-toggle"
+            style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
+          >
+            <span x-text="'⮞'"></span>
+          </button>
+        </div>
+        <button
+          x-show="!open"
+          @click="expandToc()"
+          aria-label="Expandir TOC"
+          class="sidebar-toggle"
+          style="position: fixed; top: 80px; right: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
+        >
+          <span x-text="'⮜'"></span>
+        </button>
+        <template x-if="open">
+          <ul class="toc-list">
+            <template x-for="heading in tableOfContents" :key="heading.id">
+              <li class="toc-item">
+                <div style="display: flex; align-items: center;">
+                  <button x-show="heading.children.length" @click.stop="toggle(heading)" style="background: none; border: none; cursor: pointer; margin-right: 0.3em; font-size: 1.1em;">
+                    <span x-text="heading.collapsed ? '⮞' : '⮟'" aria-label="Expandir/Colapsar"></span>
+                  </button>
+                  <a class="toc-link" :class="`level-${heading.level}`" @click="scrollToHeading(heading.id)" x-text="heading.text"></a>
+                </div>
+                <ul x-show="!heading.collapsed" class="toc-list" style="margin-left: 1em;" x-if="heading.children.length">
+                  <template x-for="child in heading.children" :key="child.id">
+                    <li class="toc-item">
+                      <div style="display: flex; align-items: center;">
+                        <button x-show="child.children.length" @click.stop="toggle(child)" style="background: none; border: none; cursor: pointer; margin-right: 0.3em; font-size: 1.1em;">
+                          <span x-text="child.collapsed ? '⮞' : '⮟'" aria-label="Expandir/Colapsar"></span>
+                        </button>
+                        <a class="toc-link" :class="`level-${child.level}`" @click="scrollToHeading(child.id)" x-text="child.text"></a>
+                      </div>
+                      <ul x-show="!child.collapsed" class="toc-list" style="margin-left: 1em;" x-if="child.children.length">
+                        <template x-for="grand in child.children" :key="grand.id">
+                          <li class="toc-item">
+                            <div style="display: flex; align-items: center;">
+                              <button x-show="grand.children.length" @click.stop="toggle(grand)" style="background: none; border: none; cursor: pointer; margin-right: 0.3em; font-size: 1.1em;">
+                                <span x-text="grand.collapsed ? '⮞' : '⮟'" aria-label="Expandir/Colapsar"></span>
+                              </button>
+                              <a class="toc-link" :class="`level-${grand.level}`" @click="scrollToHeading(grand.id)" x-text="grand.text"></a>
+                            </div>
+                            <!-- Puedes seguir anidando más niveles si lo deseas -->
+                          </li>
+                        </template>
+                      </ul>
+                    </li>
+                  </template>
+                </ul>
+              </li>
+            </template>
+          </ul>
+        </template>
+      </aside>
+    </div>
+
+    <script>
+      function docsApp() {
+  return {
+    darkMode: false,
+    sidebarOpen: true,
+    tocOpen: true,
+    currentPage: 'introduction',
+    searchQuery: '',
+    searchResults: [],
+    searchModalOpen: false,
+    renderedContent: '',
+    tableOfContents: [],
+    logo: '{{LOGO}}',
+    logoUrl: '{{LOGO_URL}}',
+    title: '{{TITLE}}',
+    pages: {{PAGES_CONTENT}},
+    navigation: {{NAVIGATION_CONTENT}},
+    sidebarSections: {{SIDEBAR_CONTENT}},
+    collapsedSections: [],
+    init() {
+      let hash = window.location.hash.replace(/^#/, '') || 'introduction';
+      let [pageId, anchor] = hash.split('#');
+      this.loadPage(pageId, null, anchor);
+      this.darkMode = localStorage.getItem('darkMode') === 'true';
+      this.$watch('darkMode', value => {
+        localStorage.setItem('darkMode', value);
+      });
+      this.collapsedSections = this.sidebarSections.map(s => s.collapsed ?? false);
+    },
+    closeSearchModal() {
+      this.searchModalOpen = false;
+      this.searchQuery = '';
+      this.searchResults = [];
+    },
+    loadPage(pageId, highlightTerm = null, anchor = null) {
+      this.currentPage = pageId;
+      let content = this.pages[pageId] || '# Página no encontrada';
+      if (highlightTerm) {
+        const regex = new RegExp(`(${highlightTerm})`, 'gi');
+        content = content.replace(regex, '<mark>$1</mark>');
+      }
+      content = content
+        .replace(/\^(.*?)\^/g, '<sup>$1</sup>')
+        .replace(/~(.*?)~/g, '<sub>$1</sub>');
+      this.renderedContent = marked.parse(content);
+      this.$nextTick(() => {
+        this.generateToc();
+        this.addHeadingIds();
+        this.renderMermaid();
+        if (anchor) {
+          setTimeout(() => {
+            const el = document.getElementById(anchor);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      });
+      this.searchResults = [];
+      this.searchQuery = '';
+    },
+    renderMermaid() {
+      document.querySelectorAll('.markdown-content pre code.language-mermaid').forEach((block) => {
+        const pre = block.parentElement;
+        const mermaidCode = block.textContent;
+        const mermaidDiv = document.createElement('div');
+        mermaidDiv.className = 'mermaid';
+        mermaidDiv.textContent = mermaidCode;
+        pre.replaceWith(mermaidDiv);
+      });
+      if (window.mermaid) {
+        window.mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+      }
+    },
+    generateToc() {
+      const headings = Array.from(document.querySelectorAll('.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4, .markdown-content h5, .markdown-content h6'));
+      let counter = 1;
+      const tocTree = [];
+      const parents = [];
+      headings.forEach(heading => {
+        const level = parseInt(heading.tagName.charAt(1));
+        const baseId = this.slugify(heading.textContent);
+        const id = `${baseId}-${counter++}`;
+        heading.id = id;
+        const node = {
+          id,
+          text: heading.textContent,
+          level,
+          collapsed: level === 1 ? false : true, // Primer nivel expandido, los demás colapsados
+          children: []
+        };
+        while (parents.length && parents[parents.length - 1].level >= level) {
+          parents.pop();
+        }
+        if (parents.length === 0) {
+          tocTree.push(node);
+        } else {
+          parents[parents.length - 1].children.push(node);
+        }
+        parents.push(node);
+      });
+      this.tableOfContents = tocTree;
+    },
+    addHeadingIds() {
+      const headings = document.querySelectorAll('.markdown-content h1, .markdown-content h2, .markdown-content h3, .markdown-content h4, .markdown-content h5, .markdown-content h6');
+      headings.forEach(heading => {
+        if (!heading.id) {
+          heading.id = this.slugify(heading.textContent);
+        }
+      });
+    },
+    slugify(text) {
+      return text.toLowerCase()
+        .replace(/[^\u0000-\u007F\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    },
+    scrollToHeading(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    searchAllPages() {
+      const query = this.searchQuery.trim().toLowerCase();
+      if (!query) {
+        this.searchResults = [];
+        return;
+      }
+      const results = [];
+      for (const [pageId, content] of Object.entries(this.pages)) {
+        const idx = content.toLowerCase().indexOf(query);
+        if (idx !== -1) {
+          const snippetStart = Math.max(0, idx - 30);
+          const snippetEnd = Math.min(content.length, idx + query.length + 30);
+          let snippet = content.substring(snippetStart, snippetEnd);
+          snippet = snippet.replace(new RegExp(`(${this.escapeRegExp(query)})`, 'gi'), '<mark>$1</mark>');
+          let title = '';
+          const match = content.match(/^#\s+(.+)/m);
+          if (match) title = match[1];
+          else title = pageId;
+          results.push({ pageId, title, snippet });
+        }
+      }
+      this.searchResults = results;
+    },
+    goToSearchResult(result) {
+      this.loadPage(result.pageId, this.searchQuery);
+    },
+    escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    },
+    filterContent() {},
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
+    },
+    toggleAllPanels() {
+      this.sidebarOpen = !this.sidebarOpen;
+      window.dispatchEvent(new CustomEvent('toggle-toc-panel'));
+      this.tocOpen = !this.tocOpen;
+    },
+    toggleSection(idx) {
+      this.collapsedSections[idx] = !this.collapsedSections[idx];
+    },
+    setSidebarWidth(width) {
+      document.documentElement.style.setProperty('--sidebar-width', width);
+    }
+  };
+}
+    </script>
+    <style>
+/* Flechas del TOC y sidebar en modo oscuro */
+:root.dark .toc-list button span,
+:root.dark .sidebar-toggle span,
+:root.dark .sidebar-width-controls button svg,
+:root.dark .toc-width-controls button svg,
+:root.dark .sidebar-btn svg,
+:root.dark .header-controls .sidebar-toggle span,
+:root.dark .header-controls .sidebar-toggle {
+  color: #fff !important;
+  stroke: #fff !important;
+  fill: #fff !important;
+  border-color: #fff !important;
+  filter: brightness(2) contrast(2) drop-shadow(0 0 2px #fff);
+}
+:root.dark .sidebar-toggle,
+:root.dark .sidebar-btn,
+:root.dark .sidebar-width-controls button,
+:root.dark .toc-width-controls button {
+  background: #222 !important;
+  border-color: #fff !important;
+  box-shadow: 0 0 0 1.5px #fff, 0 2px 8px rgba(0,0,0,0.2);
+}
+:root.dark .theme-toggle span[style*='font-size: 0.8em;']:not([x-show='!darkMode']) {
+  filter: brightness(1.5) sepia(1) hue-rotate(10deg) saturate(5) drop-shadow(0 0 2px #ffd700);
+}
+</style>
+  </body>
+</html>
