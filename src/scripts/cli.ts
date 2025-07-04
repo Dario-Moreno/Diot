@@ -43,7 +43,7 @@ async function initProject() {
     'src/config',
     'src/templates',
     'scripts',
-    'dist',
+    'docs',
   ]
 
   for (const dir of dirs) {
@@ -164,7 +164,7 @@ async function devMode() {
   await buildDocs()
 
   // Servir archivos
-  const server = spawn('npx', ['http-server', 'dist', '-p', '3000', '-o'], {
+  const server = spawn('npx', ['http-server', 'docs', '-p', '3000', '-o'], {
     stdio: 'inherit',
   })
 

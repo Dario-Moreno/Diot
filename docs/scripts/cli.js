@@ -74,7 +74,7 @@ async function initProject() {
         'src/config',
         'src/templates',
         'scripts',
-        'dist',
+        'docs',
     ];
     for (const dir of dirs) {
         if (!fs.existsSync(dir)) {
@@ -184,7 +184,7 @@ async function devMode() {
     // Construir una vez
     await (0, build_1.buildDocs)();
     // Servir archivos
-    const server = (0, child_process_1.spawn)('npx', ['http-server', 'dist', '-p', '3000', '-o'], {
+    const server = (0, child_process_1.spawn)('npx', ['http-server', 'docs', '-p', '3000', '-o'], {
         stdio: 'inherit',
     });
     console.log('🌐 Servidor iniciado en http://localhost:3000');

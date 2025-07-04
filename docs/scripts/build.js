@@ -210,12 +210,12 @@ exports.DocsBuilder = DocsBuilder;
 async function buildDocs() {
     try {
         // Importar configuración
-        const configPath = path.resolve('dist/config/docs.config.js');
+        const configPath = path.resolve('docs/config/docs.config.js');
         const { docsConfig } = await Promise.resolve(`${configPath}`).then(s => __importStar(require(s)));
         // Opciones de construcción
         const buildOptions = {
             inputDir: 'src',
-            outputDir: 'dist',
+            outputDir: 'docs',
             configFile: 'src/config/docs.config.ts',
             templateFile: 'src/templates/base.html',
         };

@@ -3,7 +3,8 @@
     "target": "ES2020",
     "module": "CommonJS",
     "lib": ["ES2020", "DOM"],
-    "outDir": "./docs",
+    // "outDir": "./dist", // ← Anterior salida
+    "outDir": "./docs", // ← Nueva salida para GitHub Pages
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
@@ -34,7 +35,8 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  // "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"], // ← Anterior exclusión
+  "exclude": ["node_modules", "docs", "**/*.test.ts", "**/*.spec.ts"], // ← Nueva exclusión
   "ts-node": {
     "esm": true
   }

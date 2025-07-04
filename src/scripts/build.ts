@@ -183,7 +183,7 @@ export class DocsBuilder {
       '{{FAVICON}}',
       this.config.favicon || '/favicon.ico'
     )
-//    this.config.logo = '';
+    //    this.config.logo = '';
     template = template.replace('{{LOGO_URL}}', this.config.logoUrl || '')
     template = template
       .replace(/\{\{TITLE\}\}/g, this.config.title)
@@ -226,13 +226,13 @@ export class DocsBuilder {
 export async function buildDocs(): Promise<void> {
   try {
     // Importar configuración
-    const configPath = path.resolve('dist/config/docs.config.js')
+    const configPath = path.resolve('docs/config/docs.config.js')
     const { docsConfig } = await import(configPath)
 
     // Opciones de construcción
     const buildOptions: BuildOptions = {
       inputDir: 'src',
-      outputDir: 'dist',
+      outputDir: 'docs',
       configFile: 'src/config/docs.config.ts',
       templateFile: 'src/templates/base.html',
     }

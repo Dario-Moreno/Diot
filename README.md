@@ -46,7 +46,7 @@ npm run build
 1. **Crear archivos Markdown** en `src/content/docs/`
 2. **Configurar la navegación** en `src/config/docs.config.ts`
 3. **Ejecutar el build** con `npm run build`
-4. **¡Listo!** Tu documentación está en `dist/index.html`
+4. **¡Listo!** Tu documentación está en `docs/index.html`
 
 ## 📁 Estructura del proyecto
 
@@ -67,7 +67,7 @@ docs-spa-builder/
 │   ├── cli.ts                # 💻 CLI
 │   ├── types.ts              # 📋 Tipos TypeScript
 │   └── utils.ts              # 🛠️ Utilidades
-├── dist/
+├── docs/
 │   └── index.html            # 🎯 Archivo generado
 ├── package.json
 └── README.md
@@ -186,7 +186,7 @@ Búsqueda en tiempo real que resalta coincidencias en el contenido actual.
 
 ## 🚀 Despliegue
 
-El archivo generado `dist/index.html` es completamente autónomo:
+El archivo generado `docs/index.html` es completamente autónomo:
 
 - **Netlify**: Arrastra y suelta el archivo
 - **Vercel**: Sube el archivo directamente
