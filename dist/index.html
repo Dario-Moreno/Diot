@@ -500,9 +500,14 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
           />
           <div style="display: flex; flex-direction: column; gap: 0.18rem; align-items: flex-end;">
             <!-- Botón para colapsar/mostrar ambos paneles -->
-            <button class="sidebar-toggle" @click="toggleAllPanels()" aria-label="Colapsar/Expandir menús" style="font-size: 0.6rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
-              <!-- SVG doble flecha horizontal -->
-              <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M7 2L2 8L7 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 2L18 8L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <button class="sidebar-toggle" @click="toggleAllPanels()" aria-label="Colapsar/Expandir menús" style="font-size: 0.32rem; padding: 0.01rem 0.02rem; border-radius: 0.28rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end; height: 1.1rem; width: 1.7rem; display: flex; align-items: center; justify-content: center;">
+              <!-- SVG doble flecha curva: invertir el orden de las flechas -->
+              <svg width="28" height="16" viewBox="0 0 140 80" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+                <path d="M130,70 Q105,40 130,10 L95,40 Z"/>
+                <polygon points="95,40 105,34 105,46" style="fill:currentColor;"/>
+                <path d="M10,70 Q35,40 10,10 L45,40 Z"/>
+                <polygon points="45,40 35,34 35,46" style="fill:currentColor;"/>
+              </svg>
             </button>
             <button class="theme-toggle" @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode);" :aria-label="darkMode ? 'Modo claro' : 'Modo oscuro'" style="font-size: 0.65rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
               <span x-show="!darkMode" style="font-size: 0.8em;">🌙</span>
@@ -665,10 +670,13 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
             @click="toggleSidebar()"
             :aria-label="'Colapsar menú'"
             class="sidebar-toggle"
-            style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
+            style="font-size: 0.32rem; padding: 0.01rem 0.02rem; border-radius: 0.28rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center; height: 1.1rem; width: 1.1rem; display: flex; align-items: center; justify-content: center;"
           >
-            <!-- SVG flecha izquierda -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+            <!-- SVG flecha izquierda curva, cabeza ajustada y centrada -->
+            <svg width="16" height="16" viewBox="0 0 60 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M50,50 Q30,30 50,10 L20,30 Z"/>
+              <polygon points="20,30 30,25 30,35" style="fill:currentColor;"/>
+            </svg>
           </button>
           <button @click="setSidebarWidth('200px')" class="sidebar-btn sidebar-icon-btn" title="Angosto" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
             <!-- Angosto: Arrow bar left -->
@@ -731,10 +739,13 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
         @click="toggleSidebar()"
         aria-label="Mostrar menú"
         class="sidebar-toggle"
-        style="position: fixed; top: 80px; left: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
+        style="position: fixed; top: 80px; left: 8px; z-index: 2000; font-size: 0.32rem; padding: 0.01rem 0.02rem; border-radius: 0.28rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; height: 1.1rem; width: 1.1rem; display: flex; align-items: center; justify-content: center;"
       >
-        <!-- SVG flecha derecha -->
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+        <!-- SVG flecha derecha curva, cabeza ajustada y centrada -->
+        <svg width="16" height="16" viewBox="0 0 60 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,50 Q30,30 10,10 L40,30 Z"/>
+          <polygon points="40,30 30,25 30,35" style="fill:currentColor;"/>
+        </svg>
       </button>
 
       <!-- Main Content -->
@@ -842,10 +853,13 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
             @click="collapseToc()"
             aria-label="Colapsar TOC"
             class="sidebar-toggle"
-            style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
+            style="font-size: 0.32rem; padding: 0.01rem 0.02rem; border-radius: 0.28rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center; height: 1.1rem; width: 1.1rem; display: flex; align-items: center; justify-content: center;"
           >
-            <!-- SVG flecha derecha -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            <!-- SVG flecha derecha curva, cabeza ajustada y centrada -->
+            <svg width="16" height="16" viewBox="0 0 60 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10,50 Q30,30 10,10 L40,30 Z"/>
+              <polygon points="40,30 30,25 30,35" style="fill:currentColor;"/>
+            </svg>
           </button>
         </div>
         <button
@@ -853,10 +867,13 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
           @click="expandToc()"
           aria-label="Expandir TOC"
           class="sidebar-toggle"
-          style="position: fixed; top: 80px; right: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
+          style="position: fixed; top: 80px; right: 8px; z-index: 2000; font-size: 0.32rem; padding: 0.01rem 0.02rem; border-radius: 0.28rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; height: 1.1rem; width: 1.1rem; display: flex; align-items: center; justify-content: center;"
         >
-          <!-- SVG flecha izquierda -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          <!-- SVG flecha izquierda curva, cabeza ajustada y centrada -->
+          <svg width="16" height="16" viewBox="0 0 60 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50,50 Q30,30 50,10 L20,30 Z"/>
+            <polygon points="20,30 30,25 30,35" style="fill:currentColor;"/>
+          </svg>
         </button>
         <template x-if="open">
           <ul class="toc-list">
