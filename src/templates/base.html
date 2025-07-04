@@ -54,7 +54,8 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
           <div style="display: flex; flex-direction: column; gap: 0.18rem; align-items: flex-end;">
             <!-- Botón para colapsar/mostrar ambos paneles -->
             <button class="sidebar-toggle" @click="toggleAllPanels()" aria-label="Colapsar/Expandir menús" style="font-size: 0.6rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
-              ⮜⮞
+              <!-- SVG doble flecha horizontal -->
+              <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M7 2L2 8L7 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 2L18 8L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <button class="theme-toggle" @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode);" :aria-label="darkMode ? 'Modo claro' : 'Modo oscuro'" style="font-size: 0.65rem; padding: 0.01rem 0.10rem; border-radius: 0.18rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: flex-end;">
               <span x-show="!darkMode" style="font-size: 0.8em;">🌙</span>
@@ -219,7 +220,8 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
             class="sidebar-toggle"
             style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
           >
-            <span x-text="'⮜'"></span>
+            <!-- SVG flecha izquierda -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
           </button>
           <button @click="setSidebarWidth('200px')" class="sidebar-btn sidebar-icon-btn" title="Angosto" style="font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem;">
             <!-- Angosto: Arrow bar left -->
@@ -284,7 +286,8 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
         class="sidebar-toggle"
         style="position: fixed; top: 80px; left: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
       >
-        <span x-text="'⮞'"></span>
+        <!-- SVG flecha derecha -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
       </button>
 
       <!-- Main Content -->
@@ -394,7 +397,8 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
             class="sidebar-toggle"
             style="font-size: 0.55rem; padding: 0.01rem 0.10rem; border-radius: 0.15rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer; align-self: center;"
           >
-            <span x-text="'⮞'"></span>
+            <!-- SVG flecha derecha -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
         <button
@@ -404,7 +408,8 @@ https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js
           class="sidebar-toggle"
           style="position: fixed; top: 80px; right: 8px; z-index: 2000; font-size: 0.7rem; padding: 0.04rem 0.18rem; border-radius: 0.22rem; border: 1px solid var(--border-color); background: var(--bg-secondary); cursor: pointer;"
         >
-          <span x-text="'⮜'"></span>
+          <!-- SVG flecha izquierda -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
         </button>
         <template x-if="open">
           <ul class="toc-list">
